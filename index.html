@@ -2,7 +2,10 @@
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Traveler Pro X1</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -25,13 +28,11 @@
   --t2: #7c8598;
   --t3: #444d61;
 
-  /* Accent: cool slate-blue, calibrated, not neon */
   --a:     #5b8dee;
   --a-dk:  #3d6cd4;
   --a-bg:  rgba(91,141,238,0.09);
   --a-bdr: rgba(91,141,238,0.20);
 
-  /* Semantic */
   --ok:      #4aab80;
   --ok-bg:   rgba(74,171,128,0.09);
   --ok-bdr:  rgba(74,171,128,0.20);
@@ -75,52 +76,39 @@
 
 /* ── RESET ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:var(--f);-webkit-font-smoothing:antialiased}
+html,body{
+  height:100%;
+  width:100%;
+  font-family:var(--f);
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+  /* Background matches app — no outer color visible */
+  background:var(--bg);
+  transition:background var(--dur-s) var(--ease);
+}
 button{cursor:pointer;border:none;background:none;font-family:inherit;outline:none}
 a{text-decoration:none}
 
-/* ── SHELL ── */
-body{
-  background:var(--bg);
-  background:#07080c;
-  display:block;align-items:center;justify-content:center;
-  min-height:100dvh;
-}
+/* ── SHELL — TRUE FULL SCREEN, NO CENTERING ── */
 #app{
   width:100vw;
-  height:100vh;
-  max-width:100%;
-  max-height:100%;
-  border-radius:0;
+  height:100dvh;           /* dynamic viewport height for mobile browsers */
   background:var(--bg);
-  display:flex;flex-direction:column;
-  overflow:hidden;position:relative;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  position:fixed;          /* fixed to viewport — prevents any scroll drift */
+  top:0;left:0;right:0;bottom:0;
+  /* NO border-radius, NO box-shadow, NO max-width */
   transition:background var(--dur-s) var(--ease);
-}
-@media(min-width:480px){
-  body{
-    background:#050609
-    display:flex;
-    align-items:center;
-    justify-content:center;}
-  #app{
-    width:428px;
-    height:calc(100dvh - 36px);
-    max-height:926px;
-    border-radius:40px;
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,0.052),
-      inset 0 0 0 1px rgba(255,255,255,0.022),
-      0 44px 110px rgba(0,0,0,0.78);
-    height:calc(100dvh - 36px);
-  }
 }
 
 /* ── TOPBAR ── */
 .topbar{
   flex-shrink:0;
   display:flex;align-items:center;justify-content:space-between;
-  padding:14px 18px 12px;
+  /* Respect notch/status-bar on iOS */
+  padding:calc(env(safe-area-inset-top) + 10px) 18px 12px;
   border-bottom:1px solid var(--bdr);
   background:var(--bg);
   z-index:20;
@@ -156,11 +144,12 @@ body{
 .icon-btn:hover{background:var(--bg3);color:var(--t1)}
 .icon-btn:active{transform:scale(0.91)}
 
-/* ── PAGES CONTAINER – isolated scroll per page ── */
+/* ── PAGES CONTAINER — isolated scroll per page ── */
 .pages{
   flex:1;
   overflow:hidden;
   position:relative;
+  /* Fill remaining space between topbar and bottom nav */
 }
 .page{
   position:absolute;inset:0;
@@ -171,6 +160,8 @@ body{
   opacity:0;pointer-events:none;
   transform:translateY(10px);
   transition:opacity var(--dur-s) var(--ease), transform var(--dur-s) var(--ease);
+  /* Add bottom padding for safe area (home indicator) */
+  padding-bottom:calc(14px + env(safe-area-inset-bottom));
 }
 .page::-webkit-scrollbar{display:none}
 .page.active{opacity:1;pointer-events:all;transform:translateY(0)}
@@ -333,9 +324,7 @@ body{
   display:flex;align-items:center;justify-content:center;
   position:relative;overflow:hidden;
 }
-.product-img-inner{
-  transition:transform 0.45s var(--ease);
-}
+.product-img-inner{transition:transform 0.45s var(--ease);}
 .product-img:hover .product-img-inner{transform:scale(1.06)}
 .product-pip{
   position:absolute;top:10px;left:10px;
@@ -570,7 +559,9 @@ input[type=range]::-moz-range-thumb{
   flex-shrink:0;display:flex;align-items:center;
   height:var(--nav-h);
   background:var(--card);border-top:1px solid var(--bdr);
-  padding:0 3px;padding-bottom:env(safe-area-inset-bottom);
+  padding:0 3px;
+  /* Respect home indicator on iPhone */
+  padding-bottom:env(safe-area-inset-bottom);
   transition:background var(--dur-s) var(--ease), border-color var(--dur-s) var(--ease);
 }
 .nav-btn{
@@ -590,7 +581,9 @@ input[type=range]::-moz-range-thumb{
 
 /* ── TOAST ── */
 #toast{
-  position:absolute;top:65px;left:15px;right:15px;
+  position:fixed;
+  top:calc(env(safe-area-inset-top) + 70px);
+  left:15px;right:15px;
   background:var(--t1);color:var(--bg);
   padding:10px 15px;border-radius:var(--r-sm);
   font-size:12.5px;font-weight:500;
@@ -621,7 +614,6 @@ input[type=range]::-moz-range-thumb{
 <div class="topbar">
   <div class="logo">
     <div class="logo-mark">
-      <!-- Bag icon -->
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="5" y="8" width="14" height="13" rx="2"/><path d="M8 8V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3"/>
         <line x1="12" y1="12" x2="12" y2="17"/><line x1="9.5" y1="14.5" x2="14.5" y2="14.5"/>
@@ -646,7 +638,6 @@ input[type=range]::-moz-range-thumb{
   <div class="page active" id="page-dashboard">
 
     <div class="card">
-      <!-- Ring -->
       <div class="ring-wrap">
         <div class="ring-track">
           <div class="ring-core">
@@ -662,7 +653,6 @@ input[type=range]::-moz-range-thumb{
         <div class="status-line">System: <b id="sysStatus">Connected</b></div>
       </div>
 
-      <!-- Follow button -->
       <button class="btn-p" id="followBtn" onclick="toggleFollow()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="5" r="1"/><path d="m9 20 3-6 3 6"/><path d="m6 8 6 2 6-2"/>
@@ -671,7 +661,6 @@ input[type=range]::-moz-range-thumb{
         <span id="followTxt">Start Following</span>
       </button>
 
-      <!-- Find me -->
       <button class="btn-s mt9" id="findMeBtn" onclick="findMe()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/>
@@ -681,7 +670,6 @@ input[type=range]::-moz-range-thumb{
       </button>
     </div>
 
-    <!-- Indicators -->
     <div class="lbl">System Indicators</div>
     <div class="ind-grid">
       <div class="ind" id="ind-follow"><div class="ind-pip"></div><div class="ind-lbl">Follow</div></div>
@@ -690,11 +678,9 @@ input[type=range]::-moz-range-thumb{
       <div class="ind" id="ind-gps"><div class="ind-pip"></div><div class="ind-lbl">GPS</div></div>
     </div>
 
-    <!-- Sensors -->
     <div class="lbl">Sensors</div>
     <div class="card">
       <div class="sensors">
-        <!-- Signal -->
         <div>
           <div class="sig-rssi" id="rssiVal">−58 dBm</div>
           <div class="sig-sub">RSSI · BLE</div>
@@ -704,7 +690,6 @@ input[type=range]::-moz-range-thumb{
             <div class="sb"></div>
           </div>
         </div>
-        <!-- Compass -->
         <div class="cmp-wrap">
           <div class="cmp-dial">
             <div class="cmp-needle" id="cmpNeedle">
@@ -721,33 +706,24 @@ input[type=range]::-moz-range-thumb{
       </div>
     </div>
 
-    <!-- Product Showcase -->
     <div class="lbl">Product Showcase</div>
     <div class="product-card">
       <div class="product-img">
         <div class="map-grid" style="opacity:0.6"></div>
         <div class="product-pip">Model X1</div>
         <div class="product-img-inner">
-          <!-- SVG bag illustration — clean, technical style -->
           <svg width="118" height="118" viewBox="0 0 118 118" fill="none" xmlns="http://www.w3.org/2000/svg" style="color:var(--t2)">
-            <!-- body -->
             <rect x="16" y="36" width="86" height="68" rx="10" fill="currentColor" fill-opacity="0.08" stroke="currentColor" stroke-opacity="0.3" stroke-width="2"/>
-            <!-- handle -->
             <path d="M40 36V27C40 19.268 46.268 13 54 13H64C71.732 13 78 19.268 78 27V36" stroke="currentColor" stroke-opacity="0.4" stroke-width="2" stroke-linecap="round" fill="none"/>
-            <!-- horizontal zip line -->
             <line x1="16" y1="70" x2="102" y2="70" stroke="currentColor" stroke-opacity="0.18" stroke-width="1.5" stroke-dasharray="5 4"/>
-            <!-- wheels -->
             <circle cx="33" cy="104" r="5.5" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-opacity="0.25" stroke-width="1.5"/>
             <circle cx="85" cy="104" r="5.5" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-opacity="0.25" stroke-width="1.5"/>
-            <!-- lock -->
             <rect x="50" y="56" width="18" height="14" rx="3.5" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-opacity="0.35" stroke-width="1.5"/>
             <path d="M54 56V52a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-opacity="0.35" stroke-width="1.5" stroke-linecap="round" fill="none"/>
             <circle cx="59" cy="63" r="2" fill="currentColor" fill-opacity="0.3"/>
-            <!-- tag -->
             <rect x="80" y="46" width="22" height="15" rx="4" fill="currentColor" fill-opacity="0.07" stroke="currentColor" stroke-opacity="0.22" stroke-width="1.5"/>
             <line x1="86" y1="51" x2="96" y2="51" stroke="currentColor" stroke-opacity="0.22" stroke-width="1.2"/>
             <line x1="86" y1="55" x2="93" y2="55" stroke="currentColor" stroke-opacity="0.22" stroke-width="1.2"/>
-            <!-- antenna dots (BLE symbol subtle) -->
             <circle cx="22" cy="44" r="1.5" fill="currentColor" fill-opacity="0.25"/>
             <circle cx="22" cy="50" r="1.5" fill="currentColor" fill-opacity="0.18"/>
             <circle cx="22" cy="56" r="1.5" fill="currentColor" fill-opacity="0.11"/>
@@ -766,7 +742,6 @@ input[type=range]::-moz-range-thumb{
       </div>
     </div>
 
-    <!-- Event log -->
     <div class="lbl">Event Log</div>
     <div class="card">
       <div class="log-wrap" id="logList">
@@ -800,7 +775,7 @@ input[type=range]::-moz-range-thumb{
       </div>
     </div>
     <div class="spacer"></div>
-  </div><!-- /dashboard -->
+  </div>
 
   <!-- ══ LOCATION ══ -->
   <div class="page" id="page-location">
@@ -826,7 +801,6 @@ input[type=range]::-moz-range-thumb{
       <div class="coord-row"><div class="coord-k">Updated</div><div class="coord-v dim" id="locUpdated">—</div></div>
     </div>
 
-    <!-- Map placeholder -->
     <div class="map-box mt10">
       <div class="map-grid"></div>
       <div class="map-pin-wrap">
@@ -855,7 +829,7 @@ input[type=range]::-moz-range-thumb{
     </div>
 
     <div class="spacer"></div>
-  </div><!-- /location -->
+  </div>
 
   <!-- ══ REMOTE ══ -->
   <div class="page" id="page-remote">
@@ -918,7 +892,7 @@ input[type=range]::-moz-range-thumb{
     </div>
 
     <div class="spacer"></div>
-  </div><!-- /remote -->
+  </div>
 
   <!-- ══ ABOUT ══ -->
   <div class="page" id="page-about">
@@ -1014,7 +988,7 @@ input[type=range]::-moz-range-thumb{
     </div>
 
     <div class="spacer"></div>
-  </div><!-- /about -->
+  </div>
 
   <!-- ══ CONTACT ══ -->
   <div class="page" id="page-contact">
@@ -1076,7 +1050,7 @@ input[type=range]::-moz-range-thumb{
     </div>
 
     <div class="spacer"></div>
-  </div><!-- /contact -->
+  </div>
 
 </div><!-- /pages -->
 
@@ -1114,7 +1088,7 @@ input[type=range]::-moz-range-thumb{
 const S = { following:false, speed:50, rssi:-58, compass:45, gpsFixed:false };
 
 /* ════════════════════════════════════════
-   THEME
+   THEME — sync body bg to avoid flash
 ════════════════════════════════════════ */
 function toggleTheme(){
   const h = document.documentElement;
@@ -1135,10 +1109,9 @@ function syncThemeIcon(){
 })();
 
 /* ════════════════════════════════════════
-   NAVIGATION — FULLY ISOLATED PAGES
+   NAVIGATION
 ════════════════════════════════════════ */
 function nav(name, btn){
-  // Scroll each page to top before switching
   document.querySelectorAll('.page').forEach(p => {
     p.classList.remove('active');
     p.scrollTop = 0;
