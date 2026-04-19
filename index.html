@@ -81,27 +81,36 @@ a{text-decoration:none}
 
 /* ── SHELL ── */
 body{
-  background:#07080c;
-  display:flex;align-items:center;justify-content:center;
-  min-height:100dvh;
+  margin:0;
+  padding:0;
+  background:var(--bg); /* SAME as app */
+  display:block; /* ❗ REMOVE flex */
 }
+
 #app{
-  width:100%;max-width:428px;
-  height:100dvh;max-height:926px;
-  background:var(--bg);
-  display:flex;flex-direction:column;
-  overflow:hidden;position:relative;
-  transition:background var(--dur-s) var(--ease);
+  width:100vw;
+  height:100vh;
+  max-width:100%;
+  max-height:100%;
+  border-radius:0;
 }
 @media(min-width:480px){
-  body{background:#050609}
+  body{
+    background:#050609;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
   #app{
+    width:428px;
+    height:calc(100dvh - 36px);
+    max-height:926px;
     border-radius:40px;
     box-shadow:
       0 0 0 1px rgba(255,255,255,0.052),
       inset 0 0 0 1px rgba(255,255,255,0.022),
       0 44px 110px rgba(0,0,0,0.78);
-    height:calc(100dvh - 36px);
   }
 }
 
